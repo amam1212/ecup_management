@@ -5,7 +5,7 @@ if(!isset($_SESSION["Admin"])) {
 }
 include '../connect-mysql.php';
 
-    $sql = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'data_management_ecup' AND TABLE_NAME = 'project'";
+    $sql = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'ecup_data_management' AND TABLE_NAME = 'project'";
     $objQuery = mysqli_query($objCon, $sql);
     $result = mysqli_fetch_array($objQuery, MYSQLI_ASSOC);
 ?>

@@ -5,12 +5,14 @@ if(!isset($_SESSION["Admin"])) {
 }
 include '../connect-mysql.php';
 
-if(isset($_POST["id"])) {
-    $id = $_POST["id"];
+if(isset($_GET["id"])) {
+    $id = $_GET["id"];
     $sql = "SELECT * FROM `project` WHERE id = '$id'";
     $objQuery = mysqli_query($objCon, $sql);
     $result = mysqli_fetch_array($objQuery, MYSQLI_ASSOC);
-
+if($result["id"]==null){
+    header('Location: ../home.php');
+}
 }
 else{
     header('Location: ../home.php');
@@ -42,10 +44,9 @@ else{
             <div class="card-header">
                 <i class="fa fa-table"></i>Project Detail</div>
             <div class="card-body">
-                <form action="faq.php" method="post" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-2">
-                            ID:
+                            Project ID:
                         </div>
                         <div class="col-md-10">
                             <p><?=$result["id"];?></p>
@@ -81,8 +82,8 @@ else{
 
                     <div class="row pull-right" style="padding-bottom: 1%;padding-right: 1%">
                         <div class="col-md-12">
-                            <form action="add_faq.php" method="post">
-                                <input type="hidden" name="id" value="<?=$result["id"]?>"><br>
+                            <form action="../activity_management/add_activity.php" method="post">
+                                <input type="hidden" name="project_id" value="<?=$result["id"]?>"><br>
                                 <input class="btn btn-success" type="submit" value="Create Activity">
                             </form>
                         </div>
@@ -93,10 +94,10 @@ else{
                     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                         <thead>
                         <tr>
-                            <th width="5%">ID</th>
+                            <th width="5%">No.</th>
                             <th width="40%">Activity Name</th>
                             <th width="10%">Date</th>
-                            <th width="15%">Status</th>
+                            <th width="10%">Status</th>
                             <th width="5%">View</th>
                             <th width="5%">Edit</th>
                             <th width="5%">Delete</th>
@@ -104,34 +105,43 @@ else{
                         </thead>
                         <tbody>
                         <?php
-                        if(isset($_POST["id"])) {
-                            $id = $_POST["id"];
-                            $sql = "SELECT * FROM `activity` WHERE project_id = '$id'";
+                        if(isset($_GET["id"])) {
+
+
+
+
+
+                            $id = $_GET["id"];
+                            $sql = "SELECT * from activity a 
+                            LEFT JOIN project_activity_manager pam ON pam.activity_id = a.id 
+                            LEFT JOIN project p on pam.project_id = p.id
+                            WHERE pam.project_id = $id";
                             $objQuery = mysqli_query($objCon, $sql);
 
 
                         }
-
+                        $activity_number =1;
 
                         while ($result = mysqli_fetch_array($objQuery, MYSQLI_ASSOC))
                         {
+
                             ?>
                             <!--                            <tr>-->
-                            <tr id="<?php echo $result["id"] ?>">
+                            <tr id="<?php echo $result["activity_id"] ?>">
                                 <input type="hidden" name="id" value="<?=$result["id"];?>">
-                                <td><?=$result["id"]?></td>
+                                <td><?=$activity_number;?></td>
                                 <td><?=$result["activity_name"]?></td>
                                 <td><?=$result["date"]?></td>
                                 <td><?=$result["status"]?></td>
                                 <td>
-                                    <form action="view_project.php" method="post">
-                                        <input type="hidden" name="id" value="<?=$result["id"]?>"><br>
+                                    <form action="../activity_management/view_activity.php" method="get">
+                                        <input type="hidden" name="id" value="<?=$result["activity_id"]?>"><br>
                                         <input class="btn btn-info" type="submit" value="View">
                                     </form>
                                 </td>
                                 <td>
                                     <form action="edit_faq.php" method="post">
-                                        <input type="hidden" name="id" value="<?=$result["id"]?>"><br>
+                                        <input type="hidden" name="id" value="<?=$result["activity_id"]?>"><br>
                                         <input class="btn btn-warning" type="submit" value="Edit">
                                     </form>
                                 </td>
@@ -139,8 +149,16 @@ else{
                                     <br>
                                     <button class="btn btn-danger remove">Delete</button>
                                 </td>
+<!--                                <td>-->
+<!--                                    <form action="../activity_management/check_delete.php" method="post">-->
+<!--                                        <input type="hidden" name="id" value="--><?//=$result["activity_id"]?><!--"><br>-->
+<!--                                        <input class="btn btn-warning" type="submit" value="Edit">-->
+<!--                                    </form>-->
+<!--                                </td>-->
+
                             </tr>
                             <?php
+                            $activity_number++;
                         }
                         ?>
                         </tbody>
@@ -168,6 +186,32 @@ else{
 
     <?php include '../allscripts.html'?>
 </div>
+
+
+<script>
+
+    $(".remove").click(function(){
+        var id = $(this).parents("tr").attr("id");
+
+        if(confirm('Are you sure to remove this record ?'))
+        {
+            $.ajax({
+                url: '../activity_management/check_delete.php',
+                type: 'POST',
+                data: {id: id},
+                error: function() {
+                    alert('Something is wrong');
+                },
+                success: function(data) {
+                    $("#"+id).remove();
+                    alert("Record removed successfully");
+                }
+            });
+        }
+    });
+
+</script>
+
 </body>
 
 </html>

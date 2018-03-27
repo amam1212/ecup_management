@@ -37,7 +37,7 @@ $objQuery = mysqli_query($objCon,$sql);
         <!-- Example DataTables Card-->
         <div class="card mb-3">
             <div class="card-header">
-                <i class="fa fa-table"></i>Project Management</div>
+                <i class="fa fa-table"></i> Project Management</div>
             <div class="card-body">
 
                 <div class="row pull-right" style="padding-bottom: 1%;padding-right: 1%">
@@ -77,7 +77,7 @@ $objQuery = mysqli_query($objCon,$sql);
                                 <td><?=$result["start_date"]?></td>
                                 <td><?=$result["end_date"]?></td>
                                 <td>
-                                    <form action="view_project.php" method="post">
+                                    <form action="view_project.php" method="get">
                                         <input type="hidden" name="id" value="<?=$result["id"]?>"><br>
                                         <input class="btn btn-info" type="submit" value="View">
                                     </form>

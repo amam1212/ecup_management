@@ -3,18 +3,26 @@ session_start();
 if(!isset($_SESSION["Admin"])) {
     header('Location: ../home.php');
 }
-include '../../connect-mysql.php';
 
-    $sql = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'c3spp' AND TABLE_NAME = 'news_events'";
+$project_id = $_POST["project_id"];
+
+include '../connect-mysql.php';
+
+    $sql = "SELECT COUNT(project_id) AS count_project_id FROM project_activity_manager WHERE project_id = $project_id";
     $objQuery = mysqli_query($objCon, $sql);
     $result = mysqli_fetch_array($objQuery, MYSQLI_ASSOC);
+
+$sql = "SELECT * FROM `project` WHERE `id` = $project_id";
+$objQuery = mysqli_query($objCon, $sql);
+$result2 = mysqli_fetch_array($objQuery, MYSQLI_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <title>News & Events Management</title>
+    <title>Create Activity</title>
     <?php include '../headpart.html'?>
 </head>
 
@@ -29,83 +37,59 @@ include '../../connect-mysql.php';
             <li class="breadcrumb-item">
                 <a href="#">Dashboard</a>
             </li>
-            <li class="breadcrumb-item active">Add News & Events</li>
+            <li class="breadcrumb-item active">Create Activity</li>
         </ol>
         <!-- Example DataTables Card-->
         <div class="card mb-3">
             <div class="card-header">
-                <i class="fa fa-table"></i> Add News & Events</div>
+                <i class="fa fa-table"></i> Create Activity</div>
             <div class="card-body">
                 <form action="check_add.php" method="post" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-1">
-                            ID:
+                            Project Name:
                         </div>
                         <div class="col-md-11">
-                            <?= $result["AUTO_INCREMENT"];?></div>
+                            <?= $result2["project_name"];?></div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-1">
+                            Activity Number :
+                        </div>
+                        <div class="col-md-11">
+                            <?= $result["count_project_id"]+1;?></div>
                     </div>
                     <br>
 
-                    <div class="row">
-                        <div class="col-md-1">
-                            Topic:
-                        </div>
-                        <div class="col-md-11">
-                            <input type="input" class="form-control" name="topic">
-                        </div>
-                    </div>
-                    <br>
 
+                    <input type="hidden" name="project_id" value="<?=$project_id?>">
                     <div class="row">
                         <div class="col-md-1">
-                            Summary:
+                            Activity Name:
                         </div>
                         <div class="col-md-11">
-                            <textarea type="text" class="form-control" rows="3" name="summary"></textarea>
-                        </div>
-                    </div>
-                    <br>
-
-                    <div class="row">
-                        <div class="col-md-1">
-                            Content:
-                        </div>
-                        <div class="col-md-11">
-                            <textarea type="text" class="form-control" rows="6" name="content"></textarea>
+                            <input type="input" class="form-control" name="activity_name">
                         </div>
                     </div>
                     <br>
 
                     <div class="row">
                         <div class="col-md-1">
-                            Type:
+                            Date:
                         </div>
                         <div class="col-md-11">
-                            <select class="form-control" name="type">
-                                <option value="NEWS">NEWS</option>
-                                <option value="EVENTS">EVENTS</option>
-                            </select>
+                            <input type="date" class="form-control" rows="3" name="date">
                         </div>
                     </div>
                     <br>
 
                     <div class="row">
-                        <div class="col-md-2">
-                            Start Date:
+                        <div class="col-md-1">
+                            File:
                         </div>
-                        <div class="col-md-10">
-                            <input type="date" class="form-control" name="date">
-                        </div>
-                    </div>
-                    <br>
-                    <div class="row">
-                        <div class="col-md-2">
-                            Picture :
-                        </div>
-                        <div class="col-md-10">
-                            <img id="blah" src="../../img/upload-images.jpg"
-                                 style="width: 40%" alt="your image" />
-                            <input type="file" style="width: 40%" class="form-control" name="pic" onchange="readURL(this)">
+                        <div class="col-md-11">
+                            <input type="file" style="width: 40%" multiple="" class="form-control" name="files[]" ">
                         </div>
                     </div>
                     <br>
